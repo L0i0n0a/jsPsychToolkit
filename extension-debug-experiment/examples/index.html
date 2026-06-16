@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Debug Extension Example</title>
+    <script src="https://unpkg.com/jspsych@8.2.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@2.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@2.0.0"></script>
+    <script src="../dist/index.browser.min.js"></script>
+    <link href="https://unpkg.com/jspsych@8.2.3/css/jspsych.css" rel="stylesheet" />
+  </head>
+  <body>
+    <script>
+      const jsPsych = initJsPsych({
+        on_finish: () => {
+          jsPsych.data.displayData();
+        },
+        extensions: [
+          {
+            type: jsPsychExtensionDebugExperiment,
+            params: {
+              trialNavigator: false,
+              autoResponder: true,
+              stateInspector: false,
+              jumpToTrial: 0,
+              showExport: true,
+              timelinePreview: false,
+            },
+          },
+        ],
+      });
+
+      const ext = [{ type: jsPsychExtensionDebugExperiment }];
+
+      const trials = [
+        // Trial 0: keyboard response — autoResponder cannot skip (no button), needs manual key
+        {
+          type: jsPsychHtmlKeyboardResponse,
+          stimulus: "<p><b>Trial 0 — keyboard-response</b><br>Drücke eine Taste</p>",
+          extensions: ext,
+        },
+        // Trial 1: keyboard response restricted to specific keys
+        {
+          type: jsPsychHtmlKeyboardResponse,
+          stimulus: "<p><b>Trial 1 — keyboard-response (choices: a, b)</b><br>Drücke A oder B</p>",
+          choices: ["a", "b"],
+          extensions: ext,
+        },
+        // Trial 2: button response — autoResponder clicks the first button
+        {
+          type: jsPsychHtmlButtonResponse,
+          stimulus: "<p><b>Trial 2 — button-response</b><br>AutoResponder sollte 'Weiter' klicken</p>",
+          choices: ["Weiter", "Abbrechen"],
+          extensions: ext,
+        },
+        // Trial 3: survey-text without required — autoResponder fills + submits
+        {
+          type: jsPsychSurveyText,
+          questions: [{ prompt: "Trial 3 — survey-text (optional)", name: "optional" }],
+          extensions: ext,
+        },
+        // Trial 4: survey-text with required — autoResponder must fill field before submitting
+        {
+          type: jsPsychSurveyText,
+          questions: [{ prompt: "Trial 4 — survey-text (required: true)", name: "pflicht", required: true }],
+          extensions: ext,
+        },
+        // Trial 5: keyboard response — end of experiment
+        {
+          type: jsPsychHtmlKeyboardResponse,
+          stimulus: "<p><b>Trial 5 — Ende</b><br>Drücke eine Taste um Daten anzuzeigen</p>",
+          extensions: ext,
+        },
+      ];
+
+      jsPsych.run(trials);
+    </script>
+  </body>
+</html>

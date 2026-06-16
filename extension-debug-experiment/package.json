@@ -1,0 +1,54 @@
+{
+  "name": "extension-debug-experiment",
+  "version": "0.0.1",
+  "description": "This plugin allows creators to easily debug their experiment without clicking through all trials.",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "typings": "dist/index.d.ts",
+  "unpkg": "dist/index.browser.min.js",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "source": "src/index.ts",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "npm test -- --watch",
+    "tsc": "tsc",
+    "build": "rollup --config",
+    "build:watch": "npm run build -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "",
+    "directory": "Entwicklung/CODE"
+  },
+  "keywords": [
+    "jsPsych"
+  ],
+  "author": {
+    "name": "L0i0n0a",
+    "url": ""
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "/issues"
+  },
+  "homepage": "/tree/main/Entwicklung/CODE/extension-debug-experiment/README.md",
+  "dependencies": {
+    "@citation-js/core": "^0.7.14",
+    "@citation-js/plugin-bibtex": "^0.7.14",
+    "@citation-js/plugin-cff": "^0.6.1",
+    "@citation-js/plugin-software-formats": "^0.6.1",
+    "@jspsych/plugin-html-keyboard-response": "^2.1.0",
+    "jspsych": "^8.0.0"
+  },
+  "devDependencies": {
+    "@jspsych/config": "^3.2.2",
+    "@jspsych/test-utils": "^1.0.0"
+  }
+}
