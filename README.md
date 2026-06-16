@@ -10,3 +10,6 @@ A jsPsych plugin for interface evaluation studies. Supports two modes:
 
 # extension-debug-experiment
 A jsPsych extension that adds a developer debug overlay to any experiment. Helps researchers debug without clicking through every trial manually.
+
+# Disclaimer
+These are my first ever plugins and extension, please point out any bugs, errors or new ideas for these plugins.
