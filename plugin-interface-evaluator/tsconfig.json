@@ -1,0 +1,11 @@
+{
+    "extends": "@jspsych/config/tsconfig.contrib.json",
+    "compilerOptions": {
+      "baseUrl": ".",
+      "resolveJsonModule": true,
+      "jsx": "react-jsx",
+      "types": ["vitest/globals"]
+    },
+    "include": ["src"]
+  }
+  

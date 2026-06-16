@@ -1,0 +1,1 @@
+// Placeholder — echte Plugin-Tests sind in src/__tests__/plugin.test.tsx

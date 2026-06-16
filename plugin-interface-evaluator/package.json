@@ -1,0 +1,88 @@
+{
+  "name": "plugin-interface-evaluator",
+  "version": "0.0.1",
+  "description": "A jsPsych plugin that enables users to define an interface and let users annotate or rearrange them.",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "typings": "dist/index.d.ts",
+  "unpkg": "dist/index.browser.min.js",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "source": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "serve": "npx serve .",
+    "tsc": "tsc",
+    "build": "rollup --config",
+    "build:watch": "npm run build -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "",
+    "directory": "Entwicklung/CODE"
+  },
+  "keywords": [
+    "jsPsych"
+  ],
+  "author": {
+    "name": "L0i0n0a",
+    "url": ""
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "/issues"
+  },
+  "homepage": "/tree/main/Entwicklung/CODE/plugin-interface-evaluator/README.md",
+  "dependencies": {
+    "@base-ui/react": "^1.5.0",
+    "@citation-js/core": "^0.7.14",
+    "@citation-js/plugin-bibtex": "^0.7.14",
+    "@citation-js/plugin-cff": "^0.6.1",
+    "@citation-js/plugin-software-formats": "^0.6.1",
+    "@dnd-kit/react": "^0.5.0",
+    "@fontsource-variable/inter": "^5.2.8",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "html-react-parser": "^6.1.3",
+    "html-to-image": "^1.11.13",
+    "jspsych": "^8.0.0",
+    "lucide-react": "^1.18.0",
+    "react-resizable-panels": "^4.11.2",
+    "shadcn": "^4.11.0",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.1",
+    "tw-animate-css": "^1.4.0"
+  },
+  "devDependencies": {
+    "@jspsych/config": "^3.3.3",
+    "@jspsych/test-utils": "^1.0.0",
+    "@tailwindcss/postcss": "^4.3.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "autoprefixer": "^10.5.0",
+    "esbuild": "^0.28.1",
+    "jsdom": "^29.1.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "rollup": "^4.62.0",
+    "rollup-plugin-esbuild": "^6.2.1",
+    "rollup-plugin-postcss": "^4.0.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.8"
+  },
+  "peerDependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  }
+}
