@@ -5,13 +5,14 @@ import Sidebar from "./components/layout/sidebar";
 import AnnotationProvider, { ShowAnnotationText } from "./components/utils/AnnotationProvider";
 import { ComponentItem } from "./components/component-library";
 import { toJpeg } from "html-to-image";
-import parse, { attributesToProps, domToReact, type DOMNode, type Element } from "html-react-parser";
-import AnnotateWrapper from "./components/utils/AnnotateWrapper";
-import { Annotation, Heuristic } from "./lib/types";
+import AnnotatableScreen from "./components/utils/AnnotatableScreen";
+import { Annotation, Heuristic, SeverityScale } from "./lib/types";
 import HeuristicSidebar from "./components/layout/heuristic-sidebar";
+import { Button } from "./components/ui/button";
+import { LabelsContext } from "./components/utils/LabelsContext";
+import { defaultLabels, type UiLabels } from "./lib/labels";
 
-// Must live inside <DragDropProvider> to access the dnd-kit event bus.
-// Returns null — no UI, only side-effects via useDragDropMonitor.
+// Renders nothing, only listens to dnd-kit events, so it must live inside <DragDropProvider>
 function DragMonitor({
   canvasRef,
   onDropFromSidebar,
@@ -21,7 +22,7 @@ function DragMonitor({
   onDropFromSidebar: (registryId: string, x: number, y: number) => void;
   onMoveOnCanvas: (instanceId: string, dx: number, dy: number) => void;
 }) {
-  // Stores pointer position at drag-start so we can compute dx/dy for canvas moves.
+  // Pointer position at drag start, used to compute dx/dy for canvas moves
   const startPos = useRef<{ x: number; y: number } | null>(null);
 
   useDragDropMonitor({
@@ -83,40 +84,43 @@ type AnnotateEvent = {
   t: number;
   text: string;
   heuristicId?: string;
+  severity?: number;
 };
 
 export type InteractionEvent = DropEvent | MoveEvent | AnnotateEvent;
 
-// HTML void elements cannot have children — React throws if you pass any
-const VOID_ELEMENTS = new Set(["area","base","br","col","embed","hr","img","input","link","meta","param","source","track","wbr"]);
-
-// Parses an HTML string and wraps every element with AnnotateWrapper.
-// Each element gets a sticky-note icon — clicking it opens the annotation modal.
-// idx is reset per parse call, giving each element a deterministic ID based on position.
-function AnnotatableContent({ html }: { html: string }) {
-  let idx = 0;
-  const options = {
-    replace(node: DOMNode) {
-      if (node.type === "tag") {
-        const el = node as Element;
-        const id = `${el.name}-${idx++}`;
-        const children = VOID_ELEMENTS.has(el.name)
-          ? undefined
-          : domToReact(el.children as DOMNode[], options);
-        const originalElement = React.createElement(el.name, attributesToProps(el.attribs), children);
-        return (
-          <AnnotateWrapper componentID={id} key={id}>
-            {originalElement}
-          </AnnotateWrapper>
-        );
-      }
-      return undefined;
-    },
-  };
+/*
+ * One or more annotatable HTML snapshots
+ * Multiple screens get tabs and a "s<n>:" id prefix so their annotations never collide
+ */
+function AnnotatableContent({ screens, labels, theme }: { screens: string[]; labels?: string[]; theme?: string }) {
+  const [active, setActive] = useState(0);
+  const multi = screens.length > 1;
   return (
-    <ShowAnnotationText>
-      <div className="flex-1 overflow-auto p-4">
-        {parse(html, options)}
+    // Notes are hidden in the snapshot since long texts overflow, the marker icon is enough
+    <ShowAnnotationText show={false}>
+      <div className="flex min-h-[70vh] shrink-0 flex-col gap-2 md:min-h-0 md:min-w-0 md:flex-1 md:shrink">
+        {multi && (
+          <div role="tablist" className="flex shrink-0 gap-1 overflow-x-auto pb-1">
+            {screens.map((_, i) => (
+              <Button
+                key={i}
+                role="tab"
+                aria-selected={i === active}
+                size="sm"
+                variant={i === active ? "default" : "outline"}
+                className="shrink-0"
+                onClick={() => setActive(i)}
+              >
+                {i + 1}
+                {labels?.[i] ? ` ${labels[i]}` : ""}
+              </Button>
+            ))}
+          </div>
+        )}
+        <div className="flex-1 overflow-auto rounded-md border bg-background p-2 md:p-4">
+          <AnnotatableScreen key={active} html={screens[active]} theme={theme} idPrefix={multi ? `s${active + 1}:` : ""} />
+        </div>
       </div>
     </ShowAnnotationText>
   );
@@ -134,23 +138,34 @@ export default function App({
   onFinish,
   outputType,
   interfaceContent,
+  interfaceLabels,
+  theme,
   allowedComponents,
   screenshotUI,
-  heuristic
+  heuristic,
+  severityScale,
+  labels
 }: {
   onFinish: (data: FinishData) => void;
   outputType: "Annotation" | "Interface Building";
-  interfaceContent?: ReactElement | string;
+  interfaceContent?: ReactElement | string | string[];
+  interfaceLabels?: string[];
+  /** Stylesheet scoped to the interface snapshots, see AnnotatableScreen */
+  theme?: string;
   allowedComponents?: (string | ComponentItem)[];
   screenshotUI?: boolean;
   heuristic?: Heuristic[]
+  severityScale?: SeverityScale
+  /** Overrides for the plugin's own UI texts, missing keys keep the defaults */
+  labels?: Partial<UiLabels>
 }) {
+  const ui: UiLabels = { ...defaultLabels, ...labels };
   const [components, setComponents] = useState<PlacedComponent[]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
-  // useRef instead of useState — appending events must not trigger re-renders.
+  // useRef so appending events doesn't trigger rerenders
   const events = useRef<InteractionEvent[]>([]);
   const [heuristicNoteText, setHeuristicNoteText] = useState<Record<string, string>>({});
-  // useRef so updates from AnnotationProvider don't trigger re-renders.
+  // useRef so updates from AnnotationProvider don't trigger rerenders
   const annotationsRef = useRef<Record<string, Record<string, Annotation>>>({});
 
   const handleDropFromSidebar = (registryId: string, x: number, y: number) => {
@@ -175,7 +190,7 @@ export default function App({
     events.current.push({ action: "move", instanceId, dx, dy, t: Date.now() });
   };
 
-  const handleAnnotationSave = (instanceId: string, text: string, heuristic?: string) => {
+  const handleAnnotationSave = (instanceId: string, text: string, heuristic?: string, severity?: number) => {
     setComponents((prev) =>
       prev.map((c) =>
         c.instanceId === instanceId ? { ...c, annotation: text } : c,
@@ -186,7 +201,8 @@ export default function App({
       instanceId,
       text,
       t: Date.now(),
-      heuristicId: heuristic
+      heuristicId: heuristic,
+      ...(severity !== undefined ? { severity } : {}),
     });
   };
 
@@ -194,7 +210,7 @@ export default function App({
     setHeuristicNoteText(prev => ({ ...prev, [heuristicId]: text }));
   };
 
-  // async because toJpeg is async; we must await it before handing data to jsPsych.
+  // async because toJpeg has to finish before the data goes to jsPsych
   async function handleFinish() {
     let screenshot: string | undefined;
     if (screenshotUI && canvasRef.current) {
@@ -204,27 +220,30 @@ export default function App({
   }
 
   return (
+    <LabelsContext.Provider value={ui}>
     <div className="w-screen h-screen overflow-hidden flex flex-col">
       {outputType == "Annotation" && (
-        <AnnotationProvider onSave={handleAnnotationSave} onAnnotationsChange={(a) => { annotationsRef.current = a; }}>
-          <div ref={canvasRef} className="flex flex-row flex-1 overflow-hidden gap-4 p-4">
-            {typeof interfaceContent === "string"
-              ? <AnnotatableContent html={interfaceContent} />
+        <AnnotationProvider onSave={handleAnnotationSave} onAnnotationsChange={(a) => { annotationsRef.current = a; }} severityScale={severityScale} heuristics={heuristic}>
+          {/* Stacked below md, side by side above */}
+          <div ref={canvasRef} className="mx-auto flex w-full max-w-[1800px] min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-2 md:flex-row md:gap-4 md:overflow-hidden md:p-4">
+            {typeof interfaceContent === "string" || Array.isArray(interfaceContent)
+              ? <AnnotatableContent
+                  screens={Array.isArray(interfaceContent) ? interfaceContent : [interfaceContent]}
+                  labels={interfaceLabels}
+                  theme={theme}
+                />
               : <div className="flex-1 overflow-auto">{interfaceContent}</div>
             }
             {heuristic && (
               <HeuristicSidebar heuristic={heuristic} onFinish={handleHeuristicNoteSave} />
             )}
           </div>
-          
 
-          <div className="p-4 border-t">
-            <button
-              onClick={handleFinish}
-              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-            >
-              Finish
-            </button>
+
+          <div className="p-4 border-t flex justify-center">
+            <Button onClick={handleFinish} size="lg">
+              {ui.finish}
+            </Button>
           </div>
         </AnnotationProvider>
       )}
@@ -243,17 +262,15 @@ export default function App({
               </div>
               <Sidebar components={allowedComponents} />
             </div>
-            <div className="p-4 border-t">
-              <button
-                onClick={handleFinish}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-              >
-                Finish
-              </button>
+            <div className="p-4 border-t flex justify-center">
+              <Button onClick={handleFinish} size="lg">
+                {ui.finish}
+              </Button>
             </div>
           </AnnotationProvider>
         </DragDropProvider>
       )}
     </div>
+    </LabelsContext.Provider>
   );
 }
