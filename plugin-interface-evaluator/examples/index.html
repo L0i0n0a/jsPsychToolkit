@@ -123,6 +123,62 @@
       ],
     };
 
+    // Mode 1c: Annotation, multi-screen + severity scale + custom labels
+    // Screens below are trimmed placeholders so this example stays self-contained and runnable as-is.
+    // `interface_labels` gives the tabs a name; without it they'd just be "1", "2", "3".
+    const multiScreenTrial = {
+      type: jsPsychInterfaceEvaluator,
+      outputType: "Annotation",
+      interface: [
+        `<div style="padding:24px; font-family:sans-serif;">
+           <h2>Step 1 — Welcome</h2>
+           <p>Choose a study design to get started.</p>
+           <button style="padding:8px 16px; background:#4f46e5; color:white; border:none; border-radius:4px;">Continue</button>
+         </div>`,
+        `<div style="padding:24px; font-family:sans-serif;">
+           <h2>Step 2 — Study Design</h2>
+           <select style="padding:8px; border:1px solid #ccc; border-radius:4px;">
+             <option>Between-subjects</option>
+             <option>Within-subjects</option>
+           </select>
+         </div>`,
+        `<div style="padding:24px; font-family:sans-serif;">
+           <h2>Step 3 — Plugin Selection</h2>
+           <input type="checkbox" id="p1" /> <label for="p1">html-button-response</label><br/>
+           <input type="checkbox" id="p2" /> <label for="p2">survey-likert</label>
+         </div>`,
+      ],
+      interface_labels: ["Welcome", "Study Design", "Plugin Selection"],
+      // Same 10 Nielsen heuristics as the trial above — reused, not redefined.
+      heuristic: annotationWithHeuristicsTrial.heuristic,
+      // Element ids get an "s1:", "s2:", "s3:" prefix (one per screen above) so
+      // annotations never collide between screens, even with identical markup.
+      severity_scale: {
+        title: "Severity (Nielsen 0–4)",
+        options: [
+          { value: 0, label: "0 – Not a usability problem" },
+          { value: 1, label: "1 – Cosmetic problem" },
+          { value: 2, label: "2 – Minor usability problem" },
+          { value: 3, label: "3 – Major usability problem" },
+          { value: 4, label: "4 – Usability catastrophe" },
+        ],
+      },
+      // Overrides the plugin's own UI texts (defaults are German — see
+      // src/lib/labels.ts); any subset can be given, missing keys keep the default.
+      labels: {
+        annotationTitle: "Annotation",
+        annotationPlaceholder: "What do you notice about this element?",
+        annotationHeuristic: "Heuristic",
+        annotationHeuristicPlaceholder: "Please select...",
+        cancel: "Cancel",
+        save: "Save",
+        heuristicsTitle: "Heuristics",
+        heuristicNotePlaceholder: "General note on this heuristic...",
+        heuristicDone: "Done",
+        finish: "Finish",
+      },
+    };
+
     // Mode 2: Interface Building
     // Participants build their own interface by dragging components from the sidebar onto the canvas.
     // Result: list of placed components + interaction events.
@@ -137,6 +193,7 @@
     jsPsych.run([
       annotationTrial, resultsTrial,
       annotationWithHeuristicsTrial, resultsTrial,
+      multiScreenTrial, resultsTrial,
       builderTrial, resultsTrial,
     ]);
   </script>

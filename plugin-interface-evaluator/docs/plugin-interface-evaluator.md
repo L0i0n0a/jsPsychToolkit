@@ -33,17 +33,40 @@ In addition to the [default data collected by all plugins](https://www.jspsych.o
 
 ## Install
 
-Using npm (recommended for module bundlers):
+This plugin is not published on npm or in the official jsPsych plugin registry — it lives in this repo only. Build it once, then reference it as a local `file:` dependency from your experiment project:
 
 ```bash
-npm install plugin-interface-evaluator
+cd plugin-interface-evaluator
+npm install
+npm run build
 ```
 
-Or include the prebuilt browser bundle directly in your HTML:
+```json
+// package.json of your experiment project
+"dependencies": {
+  "plugin-interface-evaluator": "file:../path/to/plugin-interface-evaluator"
+}
+```
+
+```bash
+npm install --legacy-peer-deps
+```
+
+> Plain `npm install` can fail here with `Cannot read properties of null (reading 'edgesOut')` — a known npm/arborist bug when resolving the peer-dependency tree of a nested `file:` dependency. Use `--legacy-peer-deps` to work around it.
+
+Then import it normally:
+
+```javascript
+import jsPsychInterfaceEvaluator from "plugin-interface-evaluator";
+```
+
+Or include the prebuilt browser bundle directly in your HTML instead of using a bundler:
 
 ```html
-<script src="dist/index.browser.min.js"></script>
+<script src="path/to/plugin-interface-evaluator/dist/index.browser.min.js"></script>
 ```
+
+The global `jsPsychInterfaceEvaluator` is the plugin class and can be used directly as `type` in a jsPsych trial.
 
 > **Note:** This plugin requires React 19 as a peer dependency. Make sure it is available in your project.
 

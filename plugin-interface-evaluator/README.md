@@ -11,14 +11,32 @@ Requires jsPsych v8.0.0 or later.
 
 ## Loading
 
-Build the plugin first:
+Not published on npm or in the official jsPsych plugin registry. Currently used locally via a `file:` dependency. Build the plugin first:
 
 ```bash
 npm install
 npm run build
 ```
 
-Then load in your experiment:
+For a bundler-based project, add it as a local dependency in the experiment's `package.json`:
+
+```json
+"dependencies": {
+  "plugin-interface-evaluator": "file:../path/to/plugin-interface-evaluator"
+}
+```
+
+```bash
+npm install --legacy-peer-deps
+```
+
+> Plain `npm install` can fail with `Cannot read properties of null (reading 'edgesOut')` (a known npm/arborist bug resolving peer deps of a nested `file:` dependency) — use `--legacy-peer-deps`.
+
+```javascript
+import jsPsychInterfaceEvaluator from "plugin-interface-evaluator";
+```
+
+Or load the prebuilt browser bundle directly in HTML:
 
 ```html
 <script src="/node_modules/jspsych/dist/index.browser.min.js"></script>
@@ -36,6 +54,7 @@ The global `jsPsychInterfaceEvaluator` is the plugin class and can be used direc
 | `components` | `(string \| ComponentItem)[]` | `null` | Components shown in sidebar (Interface Building only). If null, all built-in components are shown. |
 | `heuristic` | `Heuristic[]` | `null` | Optional list of heuristics shown in a sidebar during annotation. Each heuristic has `id`, `title`, `description`. |
 | `screenshot` | boolean | `false` | Capture a screenshot of the canvas at trial end (Interface Building only). |
+| `labels` | `Partial<UiLabels>` | `null` | Overrides for the plugin's own UI texts (`annotationTitle`, `annotationPlaceholder`, `annotationHeuristic`, `annotationHeuristicPlaceholder`, `cancel`, `save`, `heuristicsTitle`, `heuristicNotePlaceholder`, `heuristicDone`, `finish`). Missing entries keep the defaults (German; `finish` = "Finish"). Use it to localise the plugin. |
 
 ## Data collected
 
