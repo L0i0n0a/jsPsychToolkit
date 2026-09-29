@@ -17,7 +17,9 @@ const esbuildOptions = {
 };
 
 // Tailwind wird als PostCSS-Plugin direkt übergeben — so findet rollup-plugin-postcss es sicher
-const makePostcss = () => postcss({ inject: true, extract: false, plugins: [tailwindcss()] });
+// inject: false — CSS wird als String-Export zurückgegeben statt global in document.head injiziert,
+// damit index.tsx es selbst in den Shadow Root des Plugins einfügen kann (siehe trial()).
+const makePostcss = () => postcss({ inject: false, extract: false, plugins: [tailwindcss()] });
 
 export default defineConfig([
   // ESM + CJS module builds (used when imported via npm in a bundled experiment)

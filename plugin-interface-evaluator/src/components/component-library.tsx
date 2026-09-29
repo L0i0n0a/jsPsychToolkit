@@ -91,13 +91,13 @@ import {
 } from "./ui/tooltip"
 
 /**
- * Describes a single entry in the component registry.
- * - `id`: unique key used to identify this component type across the app.
- * - `label`: human-readable name shown in the sidebar.
- * - `category`: groups components in the sidebar (e.g. "Actions", "Form").
- * - `defaultProps`: initial prop values (informational; not yet wired to rendering).
- * - `preview()`: compact version rendered in the sidebar item.
- * - `render()`: full version rendered on the canvas after drop.
+ * Entry in the component registry
+ * `id`: unique key of the component type
+ * `label`: name shown in the sidebar
+ * `category`: sidebar group, e.g. "Actions" or "Form"
+ * `defaultProps`: initial props, not used for rendering yet
+ * `preview()`: compact version in the sidebar
+ * `render()`: full version on the canvas
  */
 export interface ComponentItem {
     id: string
@@ -108,9 +108,7 @@ export interface ComponentItem {
     render: () => JSX.Element
 }
 
-// Central registry of all UI components available to the user.
-// To add a new component: append an object here with a unique id and both
-// preview() and render() functions. It will automatically appear in the sidebar.
+// Registry of all components, new entries need a unique id, preview() and render() and show up in the sidebar automatically
 export const COMPONENT_LIBRARY = [
    /* Here all needed components that should be available in the canvas and sidebar should be listed */
    // ── Actions ──────────────────────────────────────────────────
@@ -758,9 +756,7 @@ export const COMPONENT_LIBRARY = [
   },
 ]
 
-// Transforms the flat COMPONENT_LIBRARY array into an object keyed by category.
-// Result: { "Actions": [...], "Form": [...], "Layout": [...], ... }
-// Used by Sidebar to render components grouped under their category headings.
+// COMPONENT_LIBRARY grouped by category, e.g. { "Actions": [...], "Form": [...] }
 export const COMPONENT_BY_CATEGORY = COMPONENT_LIBRARY.reduce(
   (components, item) => {
     if (!components[item.category]) {

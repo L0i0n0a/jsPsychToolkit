@@ -1,10 +1,8 @@
-// Sidebar: lists all available UI components, grouped by category.
-// Each item is draggable — dropping it onto the canvas creates a new instance.
+// Lists the available components by category, dropping one onto the canvas creates a new instance
 import { COMPONENT_LIBRARY, type ComponentItem } from "../component-library"
 import { useDraggable } from "@dnd-kit/react"
 
-// A single draggable entry in the sidebar.
-// data.source="sidebar" lets DragMonitor distinguish sidebar drags from canvas moves.
+// Draggable sidebar entry, data.source="sidebar" lets DragMonitor tell it apart from canvas moves
 function SidebarItem({ item }: { item: ComponentItem }) {
   const { ref, isDragSource } = useDraggable({
     id: `${item.id}`,
@@ -24,11 +22,11 @@ export default function Sidebar({ components }: { components?: (string | Compone
   const resolved: ComponentItem[] = components
     ? components
         .map(c => typeof c === "string"
-          ? COMPONENT_LIBRARY.find(item => item.id === c)  // ID → suche in Bibliothek
-          : c                                               // Objekt → direkt verwenden
+          ? COMPONENT_LIBRARY.find(item => item.id === c)
+          : c
         )
-        .filter((c): c is ComponentItem => c !== undefined) // nicht gefundene IDs entfernen
-    : COMPONENT_LIBRARY                                     // nichts angegeben → alles zeigen
+        .filter((c): c is ComponentItem => c !== undefined) // drop unknown IDs
+    : COMPONENT_LIBRARY                                     // nothing given → show all
 
   // Group resolved items by category for display
   const grouped = Object.entries(

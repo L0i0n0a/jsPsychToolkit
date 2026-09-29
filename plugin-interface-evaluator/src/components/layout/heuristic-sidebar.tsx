@@ -3,6 +3,7 @@ import { Textarea } from "../ui/textarea";
 import { useAnnotation } from "../utils/AnnotateContext";
 import { Button } from "../ui/button";
 import { useState } from "react";
+import { useLabels } from "../utils/LabelsContext";
 
 function HeuristicItem({
   id,
@@ -19,10 +20,11 @@ function HeuristicItem({
   onClick: () => void;
   onFinish: (id: string, text: string) => void;
 }) {
+  const labels = useLabels();
   const [textareaText, setTextAreaText] = useState("");
   return (
     <div
-      className={`p-4 m-2 ${isActive ? "border-amber-400 bg-amber-50" : ""} border rounded-md cursor-pointer`}
+      className={`p-4 m-2 ${isActive ? "border-primary bg-primary/5" : ""} border rounded-md cursor-pointer`}
       onClick={onClick}
     >
       <p className="font-medium">{title}</p>
@@ -31,14 +33,14 @@ function HeuristicItem({
         <div onClick={(e) => e.stopPropagation()}>
           <Textarea
             className="mt-2"
-            placeholder="Allgemeine Notiz zu dieser Heuristik..."
+            placeholder={labels.heuristicNotePlaceholder}
             onChange={(e) => setTextAreaText(e.target.value)}
           />
           <Button
             className="mt-2"
             onClick={() => onFinish(id, textareaText)}
           >
-            Fertig
+            {labels.heuristicDone}
           </Button>
         </div>
       )}
@@ -54,6 +56,7 @@ export default function HeuristicSidebar({
   onFinish: (id: string, text: string) => void;
 }) {
   const { heuristic: activeHeuristic, setHeuristic } = useAnnotation();
+  const labels = useLabels();
   const currentIndex = heuristic.findIndex((h) => h.id === activeHeuristic?.id);
   const next = heuristic[currentIndex + 1] ?? null;
 
@@ -63,8 +66,8 @@ export default function HeuristicSidebar({
   }
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto border rounded-md p-2 w-80">
-      <h2 className="text-lg font-semibold p-2">Heuristiken</h2>
+    <div className="flex w-full shrink-0 flex-col overflow-y-auto rounded-md border p-2 md:h-full md:w-80">
+      <h2 className="text-lg font-semibold p-2">{labels.heuristicsTitle}</h2>
       <div>
         {heuristic.map((item) => (
           <HeuristicItem
