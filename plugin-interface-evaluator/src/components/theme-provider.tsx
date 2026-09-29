@@ -1,6 +1,4 @@
-// ThemeProvider: manages dark/light/system theme for the entire app.
-// Persists the user's choice in localStorage and applies the class ("dark" | "light")
-// to <html> so Tailwind's dark-mode classes activate correctly.
+// Manages the dark/light/system theme, stores it in localStorage and sets the class on <html> for Tailwind
 /* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 
@@ -42,11 +40,10 @@ function getSystemTheme(): ResolvedTheme {
   return "light"
 }
 
-// Injects a <style> that suppresses all CSS transitions for one frame.
-// Prevents a visible flash when switching themes — without this, Tailwind's
-// transition-colors would animate from old to new theme colors.
-// Uses two nested rAF frames because the browser needs one frame to apply
-// the style and another to remove it after the theme class has settled.
+/*
+ * Disables all CSS transitions briefly so switching themes doesn't animate colors
+ * Two nested rAF frames: one to apply the style, one to remove it after the class settled
+ */
 function disableTransitionsTemporarily() {
   const style = document.createElement("style")
   style.appendChild(
@@ -128,8 +125,7 @@ export function ThemeProvider({
     [disableTransitionOnChange]
   )
 
-  // Apply theme on mount and whenever it changes.
-  // When theme is "system", also listen for OS-level dark/light preference changes.
+  // Apply the theme on change, in "system" mode also follow OS preference changes
   React.useEffect(() => {
     applyTheme(theme)
 
@@ -149,8 +145,7 @@ export function ThemeProvider({
     }
   }, [theme, applyTheme])
 
-  // Press "D" (without modifier keys, not inside a text field) to toggle dark/light.
-  // When in "system" mode, toggles away from the current OS-resolved theme.
+  // "D" toggles dark/light (no modifiers, not in text fields)
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
@@ -191,8 +186,7 @@ export function ThemeProvider({
     }
   }, [storageKey])
 
-  // Sync theme across browser tabs: if the user changes the theme in another tab,
-  // the storage event fires here and updates this tab to match.
+  // Sync the theme across browser tabs via the storage event
   React.useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
       if (event.storageArea !== localStorage) {

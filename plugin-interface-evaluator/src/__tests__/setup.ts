@@ -1,13 +1,13 @@
 import "@testing-library/jest-dom";
 
-// jsdom implementiert ResizeObserver nicht — @dnd-kit braucht es aber.
+// jsdom lacks ResizeObserver, needed by @dnd-kit
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
 };
 
-// jsdom implementiert getAnimations nicht — @base-ui/react braucht es aber.
+// jsdom lacks getAnimations, needed by @base-ui/react
 if (!Element.prototype.getAnimations) {
   Element.prototype.getAnimations = () => [];
 }
