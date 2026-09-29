@@ -5,6 +5,8 @@ A jsPsych plugin for interface evaluation studies. Supports two modes:
 - **Annotation** — participants annotate elements of an existing interface
 - **Interface Building** — participants build an interface from a sidebar of draggable components
 
+**New to this?** Start with the step by step guide: [English](docs/GUIDE.md) · [Deutsch](docs/ANLEITUNG.md)
+
 ## Compatibility
 
 Requires jsPsych v8.0.0 or later.
