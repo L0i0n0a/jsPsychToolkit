@@ -86,7 +86,7 @@ const info = {
     interface_labels: {
       type: ParameterType.STRING,
       array: true,
-      default: null
+      default: []
     },
     /**
      * Saves a base64 JPEG of the canvas at trial end
