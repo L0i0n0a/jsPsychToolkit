@@ -31,12 +31,12 @@ function PlacedElement({ placed }: { placed: PlacedComponent }) {
       style={{ left: placed.x, top: placed.y }}
     >
       {hasAnnotation && (
-        <div className="text-xs bg-yellow-100 border border-yellow-300 rounded px-1 mb-1">
+        <div className="text-xs bg-accent text-accent-foreground border border-primary/30 rounded px-1 mb-1">
           {annotations[placed.instanceId]?.annotationText}
         </div>
       )}
       <div className="flex justify-end" onClick={() => annotate(placed.instanceId)}>
-        <span className={`border rounded-sm bg-gray-200 hover:bg-yellow-400 ${hasAnnotation ? "bg-yellow-400 border-black" : ""}`}>
+        <span className={`border rounded-sm bg-gray-200 hover:bg-primary hover:text-primary-foreground ${hasAnnotation ? "bg-primary text-primary-foreground border-primary" : ""}`}>
           <StickyNote size={14} />
         </span>
       </div>
@@ -54,7 +54,7 @@ export function Canvas({ components }: { components: PlacedComponent[] }) {
       ref={ref}
       className={`h-full flex align-center justify-center border rounded-md ${
         isDropTarget
-          ? "border-yellow-400 bg-yellow-50/20"
+          ? "border-primary bg-primary/5"
           : "border-dashed border-gray-400"
       }`}
     >

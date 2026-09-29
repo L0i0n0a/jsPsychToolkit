@@ -13,26 +13,27 @@ export default function AnnotateWrapper({
 }) {
   const { annotate, annotations } = useAnnotation()
   const contextShowText = useContext(AnnotationShowTextContext) ?? false
-  // Explicit prop takes priority over context — callers can override per-element.
+  // The prop overrides the context value
   const showTextFinal = showText !== undefined ? showText : contextShowText
 
   const hasAnnotation = !!annotations[componentID]
 
   return (
-    // inline-block keeps the wrapper tight around the child so the absolute icon
-    // positions at the element's corner rather than stretching to full row width.
+    // inline-block keeps the wrapper tight so the icon sits at the element's corner
     <div className="relative group inline-block">
       {children}
       <span
         onClick={() => annotate(componentID)}
-        className={`absolute top-0 right-0 -translate-y-full cursor-pointer border rounded-sm bg-gray-200 hover:bg-yellow-400 px-0.5 ${
-          hasAnnotation ? "bg-yellow-400 border-black" : ""
+        className={`absolute top-0 right-0 -translate-y-full cursor-pointer border rounded-sm bg-gray-200 hover:bg-primary hover:text-primary-foreground px-0.5 transition-opacity ${
+          hasAnnotation
+            ? "bg-primary text-primary-foreground border-primary opacity-100"
+            : "opacity-0 group-hover:opacity-100"
         }`}
       >
         <StickyNote size={14} />
       </span>
       {showTextFinal && hasAnnotation && (
-        <div className="absolute top-0 right-6 -translate-y-full max-w-48 text-xs bg-yellow-100 border border-yellow-300 rounded px-1.5 py-0.5 whitespace-pre-wrap z-10">
+        <div className="absolute top-0 right-6 -translate-y-full max-w-48 text-xs bg-accent text-accent-foreground border border-primary/30 rounded px-1.5 py-0.5 whitespace-pre-wrap z-10">
           {annotations[componentID]?.annotationText}
         </div>
       )}
